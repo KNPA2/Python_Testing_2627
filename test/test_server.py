@@ -55,3 +55,18 @@ def test_purchase_past_competition(client):
     assert response.status_code == 200
     # On s'attend à ce qu'un message d'erreur apparaisse car la date est passée
     assert "past" in response.data.decode('utf-8').lower() or "passe" in response.data.decode('utf-8').lower() or "error" in response.data.decode('utf-8').lower()
+
+    
+def test_purchase_negative_places(client):
+    response = client.post(
+        '/purchasePlaces',
+        data={
+            'club': 'Simply Lift',
+            'competition': 'Spring Festival',
+            'places': '-5'  # On essaie de réserver un nombre négatif de places
+        },
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    # Le test vérifie qu'un message d'erreur lié à une saisie invalide/négative apparaît
+    assert "positive" in response.data.decode('utf-8').lower() or "invalid" in response.data.decode('utf-8').lower() or "error" in response.data.decode('utf-8').lower() or "supérieur" in response.data.decode('utf-8').lower()
