@@ -49,7 +49,13 @@ def purchasePlaces():
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
         
-        # --- CORRECTION DU BOGUE D'OVERBOOKING DE POINTS ---
+      
+        # --- LIMITE DES 12 PLACES ---
+        if placesRequired > 12:
+            flash("You cannot book more than 12 places!")
+            return render_template('welcome.html', club=club, competitions=competitions)
+        
+        # --- RESTRICTION DES POINTS ---
         if placesRequired > int(club['points']):
             flash("Not enough points available!")
             return render_template('welcome.html', club=club, competitions=competitions)
