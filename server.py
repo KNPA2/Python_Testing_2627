@@ -73,7 +73,7 @@ def purchasePlaces():
         
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
         club['points'] = int(club['points']) - placesRequired
-        flash('Great-booking complete!')
+        flash(f'Great-booking complete! You have successfully booked {placesRequired} places.')
         return render_template('welcome.html', club=club, competitions=competitions)
     except Exception:
         flash("Something went wrong, please try again.")
