@@ -41,3 +41,17 @@ def test_purchase_more_than_12_places(client):
     assert response.status_code == 200
     # Le test vérifie qu'un message d'erreur mentionnant la limite apparaît
     assert "12" in response.data.decode('utf-8') or "maximum" in response.data.decode('utf-8') or "limit" in response.data.decode('utf-8').lower()
+    
+def test_purchase_past_competition(client):
+    response = client.post(
+        '/purchasePlaces',
+        data={
+            'club': 'Simply Lift',
+            'competition': 'L\'examen Chunin',  # Vérifie dans competitions.json si c'est une compétition passée, ou adapte le nom
+            'places': '1'
+        },
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    # On s'attend à ce qu'un message d'erreur apparaisse car la date est passée
+    assert "past" in response.data.decode('utf-8').lower() or "passe" in response.data.decode('utf-8').lower() or "error" in response.data.decode('utf-8').lower()

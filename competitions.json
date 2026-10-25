@@ -9,6 +9,17 @@
             "name": "Fall Classic",
             "date": "2027-10-22 13:30:00",
             "numberOfPlaces": "130"
+        },
+
+         {
+            "name": "L'examen Chunin",
+            "date": "2025-08-17 06:00:00",
+            "numberOfPlaces": "300"
+        },
+         {
+            "name": "L'examen Hunter",
+            "date": "2027-06-27 07:00:00",
+            "numberOfPlaces": "20"
         }
     ]
 }
