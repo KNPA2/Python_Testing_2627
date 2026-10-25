@@ -1,12 +1,18 @@
 import pytest
 from server import app
 
-
 @pytest.fixture
 def client():
-    app.config["TESTING"] = True
+    app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
+
+def test_public_clubs_points_table(client):
+    response = client.get('/points')
+    assert response.status_code == 200
+    assert "Simply Lift" in response.data.decode('utf-8')
+
+
 
 
 def test_purchase_more_than_available_points(client):
