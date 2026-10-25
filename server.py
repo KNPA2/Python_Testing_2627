@@ -88,6 +88,39 @@ def purchasePlaces():
     except Exception:
         flash("Something went wrong, please try again.")
         return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
+
+  #ANNULATION D'UNE RÉSERVATION#
+@app.route('/cancelBooking', methods=['POST'])
+def cancelBooking():
+    try:
+        competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+        club = [c for c in clubs if c['name'] == request.form['club']][0]
+        placesToCancel = int(request.form['places'])
+        
+        # Vérifier si le club a des réservations pour cette compétition
+        if club['name'] in club_bookings and competition['name'] in club_bookings[club['name']]:
+            booked_places = club_bookings[club['name']][competition['name']]
+            
+            if 0 < placesToCancel <= booked_places:
+                # Mettre à jour le suivi des réservations
+                club_bookings[club['name']][competition['name']] -= placesToCancel
+                if club_bookings[club['name']][competition['name']] == 0:
+                    del club_bookings[club['name']][competition['name']]
+                
+                # Restituer les places à la compétition et les points au club
+                competition['numberOfPlaces'] = int(competition['numberOfPlaces']) + placesToCancel
+                club['points'] = int(club['points']) + placesToCancel
+                
+                flash(f'Booking cancelled successfully : {placesToCancel} places returned.')
+            else:
+                flash("Invalid number of places to cancel.")
+        else:
+            flash("No booking found for this competition.")
+            
+        return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
+    except Exception:
+        flash("An error occurred while cancelling the booking.")
+        return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))    
     
 @app.route('/points')
 def show_clubs_points():

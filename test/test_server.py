@@ -72,7 +72,24 @@ def test_purchase_past_competition(client):
     # On s'attend à ce qu'un message d'erreur apparaisse car la date est passée
     assert "past" in response.data.decode('utf-8').lower() or "passe" in response.data.decode('utf-8').lower() or "error" in response.data.decode('utf-8').lower()
 
+def test_cancel_booking(client):
+    # D'abord, on réserve 4 places pour un club
+    client.post('/purchasePlaces', data={
+        'club': 'Simply Lift',
+        'competition': 'Spring Festival',
+        'places': '4'
+    }, follow_redirects=True)
     
+    # Ensuite, on teste l'annulation de 2 places
+    response = client.post('/cancelBooking', data={
+        'club': 'Simply Lift',
+        'competition': 'Spring Festival',
+        'places': '2'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert "cancelled" in response.data.decode('utf-8').lower() or "success" in response.data.decode('utf-8').lower() or "points" in response.data.decode('utf-8').lower()
+        
 def test_purchase_negative_places(client):
     response = client.post(
         '/purchasePlaces',

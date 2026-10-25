@@ -32,13 +32,14 @@
     </ul>
     {%endwith%}
 
-    <h3>Mes réservations et points utilisés :</h3>
+    <h3>My Bookings and Used Points:</h3>
 {% if bookings %}
     <table border="1" cellpadding="8">
         <thead>
             <tr>
-                <th>Compétition</th>
-                <th>Places réservées (Points utilisés)</th>
+                <th>Competition</th>
+                <th>Booked Places</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -46,12 +47,20 @@
             <tr>
                 <td>{{ comp_name }}</td>
                 <td>{{ places }} points</td>
+                <td>
+                    <form action="{{ url_for('cancelBooking') }}" method="POST" style="display:inline;">
+                        <input type="hidden" name="club" value="{{ club['name'] }}">
+                        <input type="hidden" name="competition" value="{{ comp_name }}">
+                        <input type="number" name="places" min="1" max="{{ places }}" value="1" style="width: 50px;" required>
+                        <button type="submit">Cancel</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
-    <p>Vous n'avez encore réservé aucune place pour le moment.</p>
+    <p>You haven't booked any places yet.</p>
 {% endif %}
 </body>
 </html>
