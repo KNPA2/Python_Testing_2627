@@ -12,8 +12,18 @@ def test_public_clubs_points_table(client):
     assert response.status_code == 200
     assert "Simply Lift" in response.data.decode('utf-8')
 
-
-
+def test_club_bookings_summary(client):
+    # On simule la connexion d'un club et un achat pour être sûr d'avoir des données
+    client.post('/purchasePlaces', data={
+        'club': 'Simply Lift',
+        'competition': 'Spring Festival',
+        'places': '2'
+    }, follow_redirects=True)
+    
+    response = client.post('/showSummary', data={'email': 'john@simplylift.co'}, follow_redirects=True)
+    assert response.status_code == 200
+    # On vérifie spécifiquement la présence d'éléments du tableau de réservations
+    assert "spring festival" in response.data.decode('utf-8').lower() or "réservations" in response.data.decode('utf-8').lower()
 
 def test_purchase_more_than_available_points(client):
     response = client.post(

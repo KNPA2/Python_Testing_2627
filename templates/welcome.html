@@ -32,5 +32,26 @@
     </ul>
     {%endwith%}
 
+    <h3>Mes réservations et points utilisés :</h3>
+{% if bookings %}
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Compétition</th>
+                <th>Places réservées (Points utilisés)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comp_name, places in bookings.items() %}
+            <tr>
+                <td>{{ comp_name }}</td>
+                <td>{{ places }} points</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Vous n'avez encore réservé aucune place pour le moment.</p>
+{% endif %}
 </body>
 </html>
