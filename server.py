@@ -18,7 +18,7 @@ def loadCompetitions():
 
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'something_special')
+app.secret_key = os.environ.get('SECRET_KEY', 'default_test_secret_key')
 
 competitions = loadCompetitions()
 clubs = loadClubs()
