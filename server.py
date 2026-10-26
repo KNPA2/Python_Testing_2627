@@ -29,18 +29,19 @@ def index():
 
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
-    try:
-        # On passe l'email saisi en minuscules et on enlève les espaces
-        input_email = request.form['email'].strip().lower()
-        
-        # On compare avec les emails des clubs également mis en minuscules
-        club = [c for c in clubs if c['email'].strip().lower() == input_email][0]
-        
-        return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
-    except IndexError:
+@app.route('/showSummary', methods=['POST'])
+def showSummary():
+    email = request.form['email']
+    
+    # Recherche insensible à la casse de l'email
+    matching_clubs = [c for c in clubs if c['email'].lower() == email.lower()]
+    
+    if not matching_clubs:
         flash("Sorry, that email wasn't found.")
         return render_template('index.html')
-    
+        
+    club = matching_clubs[0]
+    return render_template('welcome.html', club=club, competitions=competitions)
 @app.route('/book/<competition>/<club>')
 def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club][0]
