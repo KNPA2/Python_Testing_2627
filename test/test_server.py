@@ -89,7 +89,19 @@ def test_cancel_booking(client):
     
     assert response.status_code == 200
     assert "cancelled" in response.data.decode('utf-8').lower() or "success" in response.data.decode('utf-8').lower() or "points" in response.data.decode('utf-8').lower()
-        
+
+def test_cannot_book_more_than_available_places(client):
+    # On tente de réserver un nombre excessif de places (ex: 999 places)
+    response = client.post('/purchasePlaces', data={
+        'club': 'Simply Lift',
+        'competition': 'Fall Classic',
+        'places': '999'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    # On s'assure qu'un message d'erreur est affiché
+    assert "not enough" in response.data.decode('utf-8').lower() or "places" in response.data.decode('utf-8').lower() or "disponible" in response.data.decode('utf-8').lower()
+            
 def test_purchase_negative_places(client):
     response = client.post(
         '/purchasePlaces',

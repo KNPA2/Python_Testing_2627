@@ -55,7 +55,6 @@ def purchasePlaces():
         club = [c for c in clubs if c['name'] == request.form['club']][0]
         placesRequired = int(request.form['places'])
         
-        # Tes vérifications existantes (positif, date, 12 places, points...)
         if placesRequired <= 0:
             flash("You must book a positive number of places!")
             return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
@@ -64,31 +63,41 @@ def purchasePlaces():
         if competition_date < datetime.now():
             flash("You cannot book places for a past competition!")
             return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
-            
-        if placesRequired > 12:
-            flash("You cannot book more than 12 places!")
+
+        # Récupérer ce que le club a déjà réservé pour cette compétition
+        current_booked = club_bookings.get(club['name'], {}).get(competition['name'], 0)
+        total_requested = current_booked + placesRequired
+
+        # 1. Vérification du maxbooking cumulé (max 12 places au total par club/compétition)
+        if total_requested > 12:
+            flash(f"You cannot have more than 12 places total for a competition! (Already booked: {current_booked})")
             return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
-            
+        
+        # 2. Vérification des points du club
         if placesRequired > int(club['points']):
             flash("Not enough points available!")
             return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
-        
+
+        # 3. Vérification du stock global de la compétition
+        if placesRequired > int(competition['numberOfPlaces']):
+            flash("Not enough places available in this competition!")
+            return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
+
+        # Mise à jour
         competition['numberOfPlaces'] = int(competition['numberOfPlaces']) - placesRequired
         club['points'] = int(club['points']) - placesRequired
-        
-        # --- ENREGISTREMENT DE LA RÉSERVATION ---
+
         if club['name'] not in club_bookings:
             club_bookings[club['name']] = {}
-        
-        current_booked = club_bookings[club['name']].get(competition['name'], 0)
-        club_bookings[club['name']][competition['name']] = current_booked + placesRequired
-        
+
+        club_bookings[club['name']][competition['name']] = total_requested
+
         flash(f'Great-booking complete! You have successfully booked {placesRequired} places.')
         return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings[club['name']])
     except Exception:
         flash("Something went wrong, please try again.")
         return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
-
+    
   #ANNULATION D'UNE RÉSERVATION#
 @app.route('/cancelBooking', methods=['POST'])
 def cancelBooking():
