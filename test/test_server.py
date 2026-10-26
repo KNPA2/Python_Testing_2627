@@ -101,7 +101,18 @@ def test_cannot_book_more_than_available_places(client):
     assert response.status_code == 200
     # On s'assure qu'un message d'erreur est affiché
     assert "not enough" in response.data.decode('utf-8').lower() or "places" in response.data.decode('utf-8').lower() or "disponible" in response.data.decode('utf-8').lower()
-            
+
+
+def test_login_case_insensitive(client):
+    # On se connecte avec des majuscules dans l'email
+    response = client.post('/showSummary', data={
+        'email': 'Kate@shelifts.co.uk'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert "Welcome" in response.data.decode('utf-8') or "kate" in response.data.decode('utf-8').lower()       
+
+
 def test_purchase_negative_places(client):
     response = client.post(
         '/purchasePlaces',

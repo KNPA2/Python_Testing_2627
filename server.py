@@ -30,10 +30,15 @@ def index():
 @app.route('/showSummary', methods=['POST'])
 def showSummary():
     try:
-        club = [c for c in clubs if c['email'] == request.form['email']][0]
+        # On passe l'email saisi en minuscules et on enlève les espaces
+        input_email = request.form['email'].strip().lower()
+        
+        # On compare avec les emails des clubs également mis en minuscules
+        club = [c for c in clubs if c['email'].strip().lower() == input_email][0]
+        
         return render_template('welcome.html', club=club, competitions=competitions, bookings=club_bookings.get(club['name'], {}))
-    except Exception:
-        flash("Something went wrong, please try again.")
+    except IndexError:
+        flash("Sorry, that email wasn't found.")
         return render_template('index.html')
     
 @app.route('/book/<competition>/<club>')
